@@ -1,0 +1,30 @@
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+domains:
+  - domain: docs.arcane.finance
+    type: PRIMARY
+    zone: arcane.finance
+features:
+  - buildpack-stack=ubuntu-22
+ingress:
+  rules:
+    - component:
+        name: arcane-docs
+      match:
+        path:
+          prefix: /
+name: arcane-docs
+region: fra
+static_sites:
+  - build_command: npm run build
+    catchall_document: index.html
+    environment_slug: node-js
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: Polynom-Labs/privacy-layer-docs-monorepo
+    index_document: index.html
+    name: arcane-docs
+    output_dir: dist
+    source_dir: /

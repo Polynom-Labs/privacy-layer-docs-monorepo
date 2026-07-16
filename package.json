@@ -1,0 +1,22 @@
+{
+  "name": "arcane-docs-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build pipeline for the Arcane documentation monorepo. Assembles the docs, sdk, and webhook submodules into a single Mintlify static site.",
+  "engines": {
+    "node": ">=20.17.0"
+  },
+  "scripts": {
+    "sync:sdk-docs": "node scripts/sync-sdk-docs.mjs",
+    "sync:webhook-openapi": "node scripts/sync-webhook-openapi.mjs",
+    "sync": "npm run sync:sdk-docs && npm run sync:webhook-openapi",
+    "dev": "npm run sync && node scripts/dev.mjs",
+    "build": "npm run sync && node scripts/build.mjs",
+    "serve": "serve dist"
+  },
+  "devDependencies": {
+    "adm-zip": "0.5.16",
+    "mintlify": "4.2.624",
+    "serve": "14.2.4"
+  }
+}
