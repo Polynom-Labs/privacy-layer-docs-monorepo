@@ -9,6 +9,9 @@ export function buildCustomKytNavGroup() {
   return {
     group: CUSTOM_KYT_GROUP_NAME,
     pages: [
+      // Hand-written content, tracked in git (unlike the API reference
+      // pages below, which are generated from webhook/openapi.yaml).
+      "products/custom-kyt-providers/overview",
       {
         group: "API reference",
         root: `${CUSTOM_KYT_PAGES_DIR_RELATIVE}/overview`,
