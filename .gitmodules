@@ -1,9 +1,9 @@
 [submodule "main"]
 	path = docs
-	url = https://github.com/Polynom-Labs/docs.git
+	url = ../docs.git
 [submodule "sdk"]
 	path = sdk
-	url = https://github.com/Polynom-Labs/privacy-layer-confidential-sdk.git
+	url = ../privacy-layer-confidential-sdk.git
 [submodule "webhook"]
 	path = webhook
-	url = https://github.com/Polynom-Labs/reference-csv-blacklist-service.git
+	url = ../reference-csv-blacklist-service.git

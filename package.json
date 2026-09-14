@@ -7,7 +7,8 @@
     "node": ">=20.17.0"
   },
   "scripts": {
-    "sync:sdk-docs": "node scripts/sync-sdk-docs.mjs",
+    "ensure-submodules": "node scripts/ensure-submodules.mjs",
+    "sync:sdk-docs": "npm run ensure-submodules && node scripts/sync-sdk-docs.mjs",
     "sync:webhook-openapi": "node scripts/sync-webhook-openapi.mjs",
     "sync": "npm run sync:sdk-docs && npm run sync:webhook-openapi",
     "dev": "npm run sync && node scripts/dev.mjs",
