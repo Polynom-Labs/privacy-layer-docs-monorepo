@@ -1,11 +1,11 @@
 // Lets build/dev scripts merge generated navigation (currently just the
 // "Custom KYT providers" group) into docs/docs.json for the duration of a
-// Mintlify command, then restore the file to its git-committed content
-// afterward. docs.json stays the single source of truth in git; the merge
-// only ever exists on disk transiently.
+// Mintlify command, then restore the pre-merge working-tree content afterward.
+// Prefer the on-disk working copy so uncommitted nav edits (new SDK pages,
+// etc.) are visible in `mintlify dev`. Strip any leftover generated group
+// first in case a previous run did not restore cleanly.
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
 
 import { CUSTOM_KYT_GROUP_NAME, buildCustomKytNavGroup } from "./custom-kyt-nav.mjs";
 
@@ -22,24 +22,12 @@ function stripGeneratedGroups(docsJson) {
   if (index !== -1) navPages.splice(index, 1);
 }
 
-// Reads the git-committed version of docs.json, ignoring whatever might
-// currently be on disk (which could already carry a previous, uncommitted
-// merge). Falls back to the working copy (with generated groups stripped)
-// if docs.json has no committed history yet.
 function readBaseDocsJson(docsDir) {
   const docsJsonPath = path.join(docsDir, "docs.json");
-  try {
-    const committedText = execFileSync("git", ["show", "HEAD:docs.json"], {
-      cwd: docsDir,
-      encoding: "utf8"
-    });
-    return { text: committedText, json: JSON.parse(committedText) };
-  } catch {
-    const json = JSON.parse(fs.readFileSync(docsJsonPath, "utf8"));
-    stripGeneratedGroups(json);
-    const text = `${JSON.stringify(json, null, 2)}\n`;
-    return { text, json };
-  }
+  const json = JSON.parse(fs.readFileSync(docsJsonPath, "utf8"));
+  stripGeneratedGroups(json);
+  const text = `${JSON.stringify(json, null, 2)}\n`;
+  return { text, json };
 }
 
 function mergeGeneratedNavigation(baseJson) {
@@ -65,9 +53,9 @@ function mergeGeneratedNavigation(baseJson) {
 }
 
 // Writes the merged docs.json to disk, runs `run(registerChild)`, and
-// restores the original git-committed content afterward - including on
-// Ctrl+C - so a `mintlify dev` session never leaves a stray docs.json diff
-// behind.
+// restores the pre-merge working-tree content afterward - including on
+// Ctrl+C - so a `mintlify dev` session never leaves a stray generated
+// Custom KYT group behind, and never discards uncommitted nav edits.
 //
 // `run` receives a `registerChild(childProcess)` callback. Pass it any
 // long-running child process (e.g. `mintlify dev` spawned asynchronously)
