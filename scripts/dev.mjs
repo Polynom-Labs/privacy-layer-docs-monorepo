@@ -18,7 +18,7 @@ const rootDir = path.resolve(fileURLToPath(new URL(".", import.meta.url)), "..")
 const docsDir = path.join(rootDir, "docs");
 
 const status = await withMergedDocsJson(docsDir, (registerChild) => {
-  const child = spawn("npx", ["mintlify", "dev"], {
+  const child = spawn("npx", ["mintlify", "dev", ...process.argv.slice(2)], {
     cwd: docsDir,
     stdio: "inherit",
     shell: process.platform === "win32"

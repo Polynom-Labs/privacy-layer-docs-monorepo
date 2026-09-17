@@ -16,25 +16,35 @@ function findGroupIndex(navPages, groupName) {
 }
 
 function stripGeneratedGroups(docsJson) {
-  const navPages = docsJson.navigation?.pages;
-  if (!Array.isArray(navPages)) return;
-  const index = findGroupIndex(navPages, CUSTOM_KYT_GROUP_NAME);
-  if (index !== -1) navPages.splice(index, 1);
+  function visit(value) {
+    if (Array.isArray(value)) {
+      for (let index = value.length - 1; index >= 0; index--) {
+        if (value[index]?.group === CUSTOM_KYT_GROUP_NAME) value.splice(index, 1);
+        else visit(value[index]);
+      }
+    } else if (value && typeof value === "object") {
+      for (const child of Object.values(value)) visit(child);
+    }
+  }
+  visit(docsJson.navigation);
 }
 
 function readBaseDocsJson(docsDir) {
   const docsJsonPath = path.join(docsDir, "docs.json");
   const json = JSON.parse(fs.readFileSync(docsJsonPath, "utf8"));
   stripGeneratedGroups(json);
-  const text = `${JSON.stringify(json, null, 2)}\n`;
+  const text = fs.readFileSync(docsJsonPath, "utf8");
   return { text, json };
 }
 
 function mergeGeneratedNavigation(baseJson) {
   const merged = JSON.parse(JSON.stringify(baseJson));
-  const navPages = merged.navigation?.pages;
+  const developerTab = merged.navigation?.tabs?.find(
+    (tab) => tab.tab === "Developer resources"
+  );
+  const navPages = developerTab ? developerTab.groups : merged.navigation?.pages;
   if (!Array.isArray(navPages)) {
-    throw new Error("Unexpected docs.json shape: navigation.pages is not an array");
+    throw new Error("Expected Developer resources groups or legacy navigation.pages");
   }
 
   const group = buildCustomKytNavGroup();
